@@ -1,4 +1,3 @@
-configuration= {
-    "AWS_ACCESS_KEY": "AKIAXBHRZUOSXUXKOUGM",
-    "AWS_SECRET_KEY": "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",
-}
+# No external configuration needed
+# All settings are handled via environment variables in docker-compose.yml
+# or passed directly to the application
