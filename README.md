@@ -1,234 +1,161 @@
-🌆 Smart City – Real-Time Data Engineering Platform
+# 🏙️ Smart City — Real-Time Data Engineering Platform
 
-📌 Project Overview
-
-Smart City is an end-to-end real-time data engineering platform designed to simulate and process smart city data such as traffic, GPS, weather, cameras, and emergency events.
-
-The project demonstrates how modern cities can collect massive streaming data, process it in real time, and store it in a cloud-based data lake for analytics and AI applications.
-
-This system is built using Apache Kafka, Apache Spark Structured Streaming, Docker.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Apache_Spark-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
+</p>
 
 ---
 
-🏗️ System Architecture
+## 📌 Overview
 
-IoT Data Sources
-(Vehicles, GPS, Cameras,
-Weather, Emergency)
+Smart City is an end-to-end **real-time data engineering platform** that simulates and processes smart city IoT data — including vehicle movement, GPS tracking, traffic cameras, weather sensors, and emergency events.
+
+The project demonstrates how modern cities can collect massive streaming data, process it in real time using distributed computing, and store it in a structured format ready for analytics and AI applications.
+
+---
+
+## 🏗️ System Architecture
+
+![Architecture Diagram](architecture.png)
+
+**Data flow:**
+
+```
+IoT Sensors (Python simulation)
         ↓
-Apache Kafka (Streaming)
+Apache Kafka (5 topics)
         ↓
 Apache Spark Structured Streaming
-
-
----
-
-⚙️ Technologies Used
-
-🔹 Programming
-
-Python 3
-
-
-🔹 Data Streaming
-
-Apache Kafka
-
-Apache Zookeeper
-
-
-🔹 Data Processing
-
-Apache Spark Structured Streaming
-
-
-🔹 Containerization
-
-Docker
-
-Docker Compose
-
-
+        ↓
+Local Parquet Storage (output/)
+```
 
 ---
 
-📂 Project Structure
+## ⚙️ Technologies Used
 
+| Category           | Tools                              |
+|--------------------|------------------------------------|
+| Language           | Python 3.10+                       |
+| Data Streaming     | Apache Kafka, Apache Zookeeper     |
+| Data Processing    | Apache Spark Structured Streaming  |
+| Containerization   | Docker, Docker Compose             |
+| Storage Format     | Apache Parquet                     |
+
+---
+
+## 📂 Repository Structure
+
+```
 SmartCity/
 │
-├── jops/
-│   ├── config.py          # Configuration settings
-│   ├── main.py            # Kafka producers & data simulation
-│   └── spark-city.py      # Spark streaming processing job
+├── README.md
+├── architecture.png
+├── smartcitypresentation.pdf
 │
-├── ERD Diagram.pdf        # Database entity relationship diagram
-│
-├── docker-compose.yml     # Kafka, Zookeeper, Spark cluster
-│
-├── requirements.txt       # Python dependencies
-│
-└── README.md
-
+└── SmartCity/
+    ├── docker-compose.yml
+    ├── requirements.txt
+    ├── ERD Diagram.pdf
+    └── jobs/
+        ├── config.py
+        ├── main.py
+        └── spark-city.py
+```
 
 ---
 
-🔄 Data Flow Explanation
+## 🔄 Data Flow Explanation
 
-1. Data Simulation
+### 1. Data simulation
+Smart city sensors are simulated using Python. A vehicle travels from **London → Birmingham**, generating events every 30–60 seconds:
 
-Smart city sensors are simulated using Python.
+- Vehicle information (speed, direction, make, model)
+- GPS location data
+- Traffic camera snapshots
+- Weather readings (temperature, wind, humidity, air quality)
+- Emergency alerts (accidents, fires, medical incidents)
 
-Data includes:
+### 2. Kafka streaming
+Each data source publishes messages to a dedicated Kafka topic. Zookeeper manages the Kafka broker cluster.
 
-Vehicle information
+| Topic | Data |
+|-------|------|
+| `vehicle_data` | Speed, direction, fuel type |
+| `gps_data` | Coordinates, vehicle type |
+| `traffic_data` | Camera ID, location, snapshot |
+| `weather_data` | Temperature, wind, humidity, AQI |
+| `emergency_data` | Incident type, status, description |
 
-GPS location data
-
-Camera events
-
-Weather data
-
-Emergency alerts
-
-
-
-
-2. Kafka Streaming
-
-Each data source publishes messages to Kafka topics.
-
-Zookeeper manages Kafka brokers.
-
-
-
-3. Spark Structured Streaming
-
-Spark consumes real-time data from Kafka.
-
-Applies schemas and transformations.
-
-Cleans and enriches incoming events.
-
-
-
+### 3. Spark Structured Streaming
+Spark consumes real-time data from all 5 Kafka topics simultaneously. For each topic it applies a schema, deserializes JSON, sets a 2-minute watermark, and writes the results to local Parquet files with checkpointing.
 
 ---
 
-🚀 How to Run the Project
+## 🚀 How to Run
 
-1️⃣ Clone the Repository
-
+### 1. Clone the repository
+```bash
 git clone https://github.com/Saadawy-AI/SmartCity.git
-cd SmartCity
+cd SmartCity/SmartCity
+```
 
-
----
-
-2️⃣ Install Python Dependencies
-
+### 2. Install Python dependencies
+```bash
 pip install -r requirements.txt
+```
 
-
----
-
-3️⃣ Start Services Using Docker
-
+### 3. Start all services with Docker
+```bash
 docker-compose up -d
+```
 
-This will start:
+This starts: Zookeeper · Kafka broker · Spark Master · 2 Spark Workers
 
-Zookeeper
+### 4. Run Kafka producers
+```bash
+python jobs/main.py
+```
 
-Kafka Brokers
+This simulates the vehicle journey and streams all IoT events into Kafka topics.
 
-Spark Master
+### 5. Run Spark Streaming job
+```bash
+spark-submit jobs/spark-city.py
+```
 
-Spark Workers
-
-
-
----
-
-4️⃣ Run Kafka Producers
-
-python jops/main.py
-
-This will generate and stream smart city events into Kafka topics.
-
+Spark reads from Kafka, processes the streams, and saves Parquet files to `output/data/`.
 
 ---
 
-5️⃣ Run Spark Streaming Job
+## 📊 Use Cases
 
-spark-submit jops/spark-city.py
-
-Spark will:
-
-Read data from Kafka
-
-Process streaming events
-
-Store results into AWS S3
-
-
+- 🚦 Traffic congestion monitoring
+- 🛰️ Real-time vehicle tracking
+- 🌦️ Weather impact analysis on road safety
+- 🚨 Emergency event detection and response
+- 🏙️ Smart transportation systems
 
 ---
 
-📊 Use Cases
+## 🧠 Future Improvements
 
-🚦 Traffic congestion monitoring
-
-🛰️ Real-time vehicle tracking
-
-🌦️ Weather impact analysis
-
-🚨 Emergency event detection
-
-🏙️ Smart transportation systems
+- Real-time dashboard (Streamlit / Power BI)
+- Integration with AWS S3 or Azure Data Lake for cloud storage
+- Machine learning models for traffic prediction and accident risk scoring
+- Integration with AWS Athena or Azure Synapse for querying Parquet files
+- Real IoT sensor integration
 
 ---
 
-🧠 Future Improvements
+## 👤 Author
 
-Real-time dashboard (Streamlit / Power BI)
-
-Machine learning models:
-
-Traffic prediction
-
-Accident risk prediction
-
-Energy consumption forecasting
-
-
-Integration with AWS Athena
-
-Real IoT sensor integration
-
-
+**Mohamed Saadawy**
+📎 [GitHub](https://github.com/Saadawy-AI) · [LinkedIn](https://linkedin.com/in/muhammad-saadawy) · [Portfolio](https://saadawy-ai.github.io/My-Portfolio/)
 
 ---
 
-👨‍💻 Author
-
-Mohamed El-Sameen
-Faculty of Computers & Artificial Intelligence
-Minya National University
-
-Data Engineering Enthusiast
-
-Machine Learning (NTI)
-
-Data Engineering (DEPI)
----
-
-⭐ Final Notes
-
-This project simulates an enterprise-level smart city data platform and reflects real-world data engineering architectures used in large-scale systems.
-
-If you find this project useful, feel free to ⭐ the repository.
-
-
----
-
-🚀 Built for learning, scalability, and real-time data engineering.
+> *This project simulates an enterprise-level smart city data platform and reflects real-world data engineering architectures used in large-scale systems.*
