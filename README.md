@@ -145,7 +145,7 @@ Spark reads from Kafka, processes the streams, and saves Parquet files to `outpu
 
 **Docker — all services running:**
 
-![Docker Containers](https://raw.githubusercontent.com/Saadawy-AI/SmartCity/main/Images/Docker%20containers.png)
+![Docker Containers](https://github.com/Saadawy-AI/SmartCity/blob/main/Images/Docker%20containers%20.png)
 
 **Spark cluster — master with 2 active workers:**
 
