@@ -19,7 +19,7 @@ The project demonstrates how modern cities can collect massive streaming data, p
 
 ## 🏗️ System Architecture
 
-![Architecture Diagram](architecture.png)
+![Architecture Diagram](Images/Architecture%20diagram.png)
 
 **Data flow:**
 
@@ -53,8 +53,14 @@ Local Parquet Storage (output/)
 SmartCity/
 │
 ├── README.md
-├── architecture.png
 ├── smartcitypresentation.pdf
+│
+├── Images/
+│   ├── Architecture diagram.png
+│   ├── ERD Diagram.png
+│   ├── Docker containers.png
+│   ├── Spark Master UI (2 workers ALIVE).png
+│   └── Kafka topics + console consumer.png
 │
 └── SmartCity/
     ├── docker-compose.yml
@@ -89,6 +95,10 @@ Each data source publishes messages to a dedicated Kafka topic. Zookeeper manage
 | `traffic_data` | Camera ID, location, snapshot |
 | `weather_data` | Temperature, wind, humidity, AQI |
 | `emergency_data` | Incident type, status, description |
+
+**Entity Relationship Diagram:**
+
+![ERD Diagram](Images/ERD%20Diagram.png)
 
 ### 3. Spark Structured Streaming
 Spark consumes real-time data from all 5 Kafka topics simultaneously. For each topic it applies a schema, deserializes JSON, sets a 2-minute watermark, and writes the results to local Parquet files with checkpointing.
@@ -128,6 +138,22 @@ spark-submit jobs/spark-city.py
 ```
 
 Spark reads from Kafka, processes the streams, and saves Parquet files to `output/data/`.
+
+---
+
+## 🎬 Pipeline in Action
+
+**Docker — all services running:**
+
+![Docker Containers](Images/Docker%20containers.png)
+
+**Spark cluster — master with 2 active workers:**
+
+![Spark Master UI](Images/Spark%20Master%20UI%20%282%20workers%20ALIVE%29.png)
+
+**Kafka topics streaming live data:**
+
+![Kafka Topics](Images/Kafka%20topics%20+%20console%20consumer.png)
 
 ---
 
